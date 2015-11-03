@@ -1,0 +1,480 @@
+http://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
+
+==================
+git config --global user.name "knighthunter09" >> global settings for user
+git config --global core.editor emacs  >> editor
+git config --list >> list configurations
+
+git help <verb>
+git help config >> similar to man command on unix
+
+=============
+Starting with setting up file system and projects
+
+git init
+git add *.c
+git add LICENCE
+git commint -m "initial project version" 
+
+cloning a repository
+---------------------
+git clone url target_dir
+eg: git clone https://github.com/libgit2/libgit2 mylibgit
+
+
+checking status of file {remember stages of file : stage, untracked, tracked}
+git status
+
+
+Let’s say you add a new file to your project, a simple README file. If the file didn’t exist before, and you run git status, you see your untracked file like so:
+
+$ echo 'My Project' > README
+$ git status
+On branch master
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+    README
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+===================
+
+Tracking new file
+
+eg: git add README
+git status will out pit new file: README as being tracked
+
+============
+
+Staging Modified Files
+Let’s change a file that was already tracked. If you change a previously tracked file called “CONTRIBUTING.md” and then run your git status command again, you get something that looks like this:
+
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+The “CONTRIBUTING.md” file appears under a section named “Changed but not staged for commit” – which means that a file that is tracked has been modified in the working directory but not yet staged. To stage it, you run the git add command. git add is a multipurpose command – you use it to begin tracking new files, to stage files, and to do other things like marking merge-conflicted files as resolved. It may be helpful to think of it more as “add this content to the next commit” rather than “add this file to the project”. Let’s run git add now to stage the “CONTRIBUTING.md” file, and then run git status again:
+
+$ git add CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+
+==================
+
+Both files are staged and will go into your next commit. At this point, suppose you remember one little change that you want to make in CONTRIBUTING.md before you commit it. You open it again and make that change, and you’re ready to commit. However, let’s run git status one more time:
+
+$ vim CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+What the heck? Now CONTRIBUTING.md is listed as both staged and unstaged. How is that possible? It turns out that Git stages a file exactly as it is when you run the git add command. If you commit now, the version of CONTRIBUTING.md as it was when you last ran the git add command is how it will go into the commit, not the version of the file as it looks in your working directory when you run git commit. If you modify a file after you run git add, you have to run git add again to stage the latest version of the file:
+
+$ git add CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+
+==========================
+
+Short comprehensive status
+
+git status -s
+
+or
+
+git status --short
+
+======================
+
+Ignoring Files
+Often, you’ll have a class of files that you don’t want Git to automatically add or even show you as being untracked. These are generally automatically generated files such as log files or files produced by your build system. In such cases, you can create a file listing patterns to match them named .gitignore. Here is an example .gitignore file:
+
+$ cat .gitignore
+*.[oa]
+*~
+The first line tells Git to ignore any files ending in “.o” or “.a” – object and archive files that may be the product of building your code. The second line tells Git to ignore all files that end with a tilde (~), which is used by many text editors such as Emacs to mark temporary files. You may also include a log, tmp, or pid directory; automatically generated documentation; and so on. Setting up a .gitignore file before you get going is generally a good idea so you don’t accidentally commit files that you really don’t want in your Git repository.
+
+The rules for the patterns you can put in the .gitignore file are as follows:
+
+Blank lines or lines starting with # are ignored.
+
+Standard glob patterns work.
+
+You can end patterns with a forward slash (/) to specify a directory.
+
+You can negate a pattern by starting it with an exclamation point (!).
+
+Glob patterns are like simplified regular expressions that shells use. An asterisk (*) matches zero or more characters; [abc] matches any character inside the brackets (in this case a, b, or c); a question mark (?) matches a single character; and brackets enclosing characters separated by a hyphen([0-9]) matches any character between them (in this case 0 through 9). You can also use two asterisks to match nested directories; a/**/z would match a/z, a/b/z, a/b/c/z, and so on.
+
+Here is another example .gitignore file:
+
+# no .a files
+*.a
+
+# but do track lib.a, even though you're ignoring .a files above
+!lib.a
+
+# only ignore the root TODO file, not subdir/TODO
+/TODO
+
+# ignore all files in the build/ directory
+build/
+
+# ignore doc/notes.txt, but not doc/server/arch.txt
+doc/*.txt
+
+# ignore all .txt files in the doc/ directory
+doc/**/*.txt
+GitHub maintains a fairly comprehensive list of good .gitignore file examples for dozens of projects and languages at https://github.com/github/gitignore if you want a starting point for your project.
+
+
+===========================
+
+
+See what u have staged but not yet committed
+git diff
+
+If you want to see what you have staged that will go to your next commit
+git diff --staged
+git diff --cached both the commands are synonymous
+
+
+==============
+Commiting changes
+
+git commit
+
+git commit -m "Message or fix details"
+
+
+
+================
+
+Skipping the staging area
+
+adding -a option to the git commit command makes staging automatic, so any modified file that was being tracked before
+need not go through staging again
+
+git commit -a -m "added new benchmark"
+
+=============
+
+Removing file
+
+remove file from staging area >> commit
+
+eg: rm PROJECTS.md
+    git status
+    git rm PROJECTS.md
+
+
+===============
+Renaming file
+
+git mv file_from file_to
+git mv README.md README
+git rm README.md
+git add README
+=============
+
+history
+
+git log
+
+
+=============
+Amending a commit
+
+As an example, if you commit and then realize you forgot to stage the changes in a file you wanted to add to this commit, you can do something like this:
+
+$ git commit -m 'initial commit'
+$ git add forgotten_file
+$ git commit --amend
+You end up with a single commit – the second commit replaces the results of the first.
+
+==================
+
+r example, let’s say you’ve changed two files and want to commit them as two separate changes, but you accidentally type git add * and stage them both. How can you unstage one of the two? The git status command reminds you:
+
+$ git add .
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    renamed:    README.md -> README
+    modified:   CONTRIBUTING.md
+Right below the “Changes to be committed” text, it says use git reset HEAD <file>... to unstage. So, let’s use that advice to unstage the CONTRIBUTING.md file:
+
+$ git reset HEAD CONTRIBUTING.md
+Unstaged changes after reset:
+M	CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    renamed:    README.md -> README
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+The command is a bit strange, but it works. The CONTRIBUTING.md file is modified but once again unstaged.
+
+While git reset can be a dangerous command if you call it with --hard, in this instance the file in your working directory is not touched. Calling git reset without an option is not dangerous - it only touches your staging are
+
+======================
+
+
+What if you realize that you don’t want to keep your changes to the CONTRIBUTING.md file? How can you easily unmodify it – revert it back to what it looked like when you last committed (or initially cloned, or however you got it into your working directory)? Luckily, git status tells you how to do that, too. In the last example output, the unstaged area looks like this:
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+It tells you pretty explicitly how to discard the changes you’ve made. Let’s do what it says:
+
+$ git checkout -- CONTRIBUTING.md
+$ git status
+On branch master
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    renamed:    README.md -> README
+You can see that the changes have been reverted.
+
+It’s important to understand that git checkout -- [file] is a dangerous command. Any changes you made to that file are gone – you just copied another file over it. Don’t ever use this command unless you absolutely know that you don’t want the file.
+
+======================
+
+
+Showing your remote
+
+To see what remote servers you have configured, if cloned from a repository by default git gives to the server cloned from
+
+git clone https://github.com/schacon/ticgit
+Cloning into 'ticgit'...
+remote: Reusing existing pack: 1857, done
+remote: Total 1857 (delta 0),reused 0 (delta 0)
+....
+$cd ticgit
+$git remote
+origin
+
+You can also specify -v, which shows you the URLs that Git has stored for the shortname to be used when reading and writing to that remote:
+
+$ git remote -v
+origin	https://github.com/schacon/ticgit (fetch)
+origin	https://github.com/schacon/ticgit (push)
+
+=======
+
+Adding a new git remote repository
+
+git remote add [shortname] [url]
+
+
+>>>> 
+$ git remote
+origin
+$ git remote add pb https://github.com/paulboone/ticgit
+$ git remote -v
+origin	https://github.com/schacon/ticgit (fetch)
+origin	https://github.com/schacon/ticgit (push)
+pb	https://github.com/paulboone/ticgit (fetch)
+pb	https://github.com/paulboone/ticgit (push)
+
+
+git fetch pb     >>>>> >getting data from your remote server
+
+==========
+
+Fetching and Pulling from Your Remotes
+As you just saw, to get data from your remote projects, you can run:
+
+$ git fetch [remote-name]
+The command goes out to that remote project and pulls down all the data from that remote project that you don’t have yet. After you do this, you should have references to all the branches from that remote, which you can merge in or inspect at any time.
+
+If you clone a repository, the command automatically adds that remote repository under the name “origin”. So, git fetch origin fetches any new work that has been pushed to that server since you cloned (or last fetched from) it. It’s important to note that the git fetch command pulls the data to your local repository – it doesn’t automatically merge it with any of your work or modify what you’re currently working on. You have to merge it manually into your work when you’re ready.
+
+If you have a branch set up to track a remote branch (see the next section and Chapter 3 for more information), you can use the git pull command to automatically fetch and then merge a remote branch into your current branch. This may be an easier or more comfortable workflow for you; and by default, the git clone command automatically sets up your local master branch to track the remote master branch (or whatever the default branch is called) on the server you cloned from. Running git pull generally fetches data from the server you originally cloned from and automatically tries to merge it into the code you’re currently working on.
+
+
+==================
+
+Pushing to Your Remotes
+When you have your project at a point that you want to share, you have to push it upstream. The command for this is simple: git push [remote-name] [branch-name]. If you want to push your master branch to your origin server (again, cloning generally sets up both of those names for you automatically), then you can run this to push any commits you’ve done back up to the server:
+
+$ git push origin master
+This command works only if you cloned from a server to which you have write access and if nobody has pushed in the meantime. If you and someone else clone at the same time and they push upstream and then you push upstream, your push will rightly be rejected. You’ll have to pull down their work first and incorporate it into yours before you’ll be allowed to push. See Chapter 3 for more detailed information on how to push to remote servers.
+
+======================
+
+
+Removing and Renaming Remotes
+If you want to rename a reference you can run git remote rename to change a remote’s shortname. For instance, if you want to rename pb to paul, you can do so with git remote rename:
+
+$ git remote rename pb paul
+$ git remote
+origin
+paul
+
+=================
+VERY IMPORTANT
+
+http://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell
+
+creating a new branch in git: git branch testing
+ Switiching branches: git checkout testing
+
+head moves when you checkout
+
+
+===========
+
+
+$ git checkout -b iss53
+Switched to a new branch "iss53"
+This is shorthand for:
+
+$ git branch iss53
+$ git checkout iss53
+
+
+
+You can run your tests, make sure the hotfix is what you want, and merge it back into your master branch to deploy to production. You do this with the git merge command:
+
+$ git checkout master
+$ git merge hotfix
+Updating f42c576..3a0874c
+Fast-forward
+ index.html | 2 ++
+ 1 file changed, 2 insertions(+)
+You’ll notice the phrase “fast-forward” in that merge. Because the commit pointed to by the branch you merged in was directly upstream of the commit you’re on, Git simply moves the pointer forward. To phrase that another way, when you try to merge one commit with a commit that can be reached by following the first commit’s history, Git simplifies things by moving the pointer forward because there is no divergent work to merge together – this is called a “fast-forward.”
+
+Your change is now in the snapshot of the commit pointed to by the master branch, and you can deploy the fix.
+
+
+
+
+After your super-important fix is deployed, you’re ready to switch back to the work you were doing before you were interrupted. However, first you’ll delete the hotfix branch, because you no longer need it – the master branch points at the same place. You can delete it with the -d option to git branch:
+
+$ git branch -d hotfix
+Deleted branch hotfix (3a0874c).
+Now you can switch back to your work-in-progress branch on issue #53 and continue working on it.
+
+$ git checkout iss53
+Switched to branch "iss53"
+$ vim index.html
+$ git commit -a -m 'finished the new footer [issue 53]'
+[iss53 ad82d7a] finished the new footer [issue 53]
+1 file changed, 1 insertion(+)
+
+====SQL======
+AWESOME SQL INSTRUCTION: http://www.tomjewett.com/dbdesign/dbdesign.php?page=tables.php
+==============================================================
+
+INSERT INTO customers
+                 (cfirstname, clastname, cphone, cstreet, czipcode) 
+          VALUES ('Tom', 'Jewett', '714-555-1212', '10200 Slater', '92708');
+		  
+UPDATE customers 
+          SET cphone = '714-555-2323' 
+          WHERE cphone = '714-555-1212';
+
+Knowing that the relation (table) is a set of tuples (rows) tells us more about this structure, as we saw with schemes and domains.
+
+- Each tuple/row is unique; there are no duplicates
+
+- Tuples/rows are unordered; we can display them in any way we like and the meaning doesn’t change. (SQL gives us the capability to control the display order.)
+
+- Tuples/rows may be included in a relation/table set if they are constructed on the scheme of that relation; they are excluded otherwise. (It would make no sense to have an Order row in the Customers table.)
+
+- We can define subsets of the rows by specifying criteria for inclusion in the subset. (Again, this is part of a SQL query.)
+
+- We can find the union, intersection, or difference of the rows in two or more tables, as long as they are constructed over the same scheme.		  
+
+
+
+Insuring unique rows
+
+Since each row in a table must be unique, no two rows can have exactly the same values for every one of their attributes. Therefore, there must be some set of attributes (it might be the set of all attributes) in each relation whose values, taken together, guarantee uniqueness of each row. Any set of attributes that can do this is called a super key (SK). Super keys are a property of the relation (table), filled in with any reasonable set of real-world data, even though we show them in the relation scheme drawing for convenience.
+
+The database designer picks one of the possible super key attribute sets to serve as the primary key (PK) of the relation. (Notice that the PK is an SK, but not all SKs are PKs!) The PK is sometimes also called a unique identifier for each row of the table. This is not an arbitrary choice—we’ll discuss it in detail on a later page. For our customers table, we’ll pick the customer’s first name, last name, and phone number. We are likely to have at least two customers with the same first and last name, but it is very unlikely that they will both have the same phone number.
+
+In SQL, we specify the primary key with a constraint on the table that lists the PK attributes. We also give the constraint a name that is easy for us to remember later (like “customers_pk” here).
+
+        ALTER TABLE customers 
+          ADD CONSTRAINT customers_pk
+          PRIMARY KEY (cfirstname, clastname, cphone);
+We also can specify the primary key when we create the table. The NOT NULL constraint prevents the PK attributes from being left empty, since NULL is a special constant in database systems that means “this field doesn’t have any value assigned to it.” It’s not the same as a zero length string or the number zero.
+
+        CREATE TABLE customers (
+          cfirstname    VARCHAR(20) NOT NULL,
+          clastname     VARCHAR(20) NOT NULL,
+          cphone        VARCHAR(20) NOT NULL,
+          cstreet       VARCHAR(50),
+          czipcode      VARCHAR(5)),
+          CONSTRAINT customers_pk
+            PRIMARY KEY (cfirstname, clastname, cphone);
+
+			The relation scheme for the new Orders table contains all of the attributes from the class diagram, as before. But we also need to represent the association in the database; that is, we need to record which customer placed each order. We do this by copying the PK attributes of the Customer into the Orders scheme. The copied attributes are called a foreign key (FK), which is simply an image of the linked relation’s primary key.
+
+Customer-order 
+        relation scheme diagram
+
+Other views of this diagram: Large image - Data dictionary (text)
+
+• Since we can’t have an order without a customer, we call Customers the parent and Orders the child scheme in this association. The “one” side of an association is always the parent, and provides the PK attributes to be copied. The “many” side of an association is always the child, into which the FK attributes are copied. Memorize it: one, parent, PK; many, child, FK.
+
+• An FK might or might not become part of the PK of the child relation into which it is copied. In this case, it does, since we need to know both who placed an order and when the order was placed in order to identify it uniquely.
+
+CREATE TABLE orders (
+          cfirstname    VARCHAR(20),
+          clastname     VARCHAR(20),
+          cphone        VARCHAR(20),
+          orderdate     DATE,
+          soldby        VARCHAR(20));
+		  
+		  
+ ALTER TABLE orders 
+          ADD CONSTRAINT orders_pk
+          PRIMARY KEY (cfirstname, clastname, cphone, orderdate);
+
+ALTER TABLE orders 
+          ADD CONSTRAINT orders_customers_fk
+          FOREIGN KEY (cfirstname, clastname, cphone)
+          REFERENCES customers (cfirstname, clastname, cphone);
+
+		  
